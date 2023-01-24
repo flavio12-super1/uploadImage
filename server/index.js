@@ -9,6 +9,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 
+import axios from "axios";
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -82,17 +84,62 @@ app.get("/api/posts", async (req, res) => {
     const length = users.length;
 
     for (let i = 0; i < length; i++) {
-      console.log(users[i].images);
       let imgURL = users[i].images;
+      let imgId = users[i]._id;
+      getExpirationDate(imgURL, imgId);
+
       data.push({ imgURL: imgURL });
     }
 
-    console.log(data);
+    // console.log(data);
     res.status(201).send(data);
   });
 
   //
 });
+
+function updateDatabase(imageUrl, imgId) {
+  Image.findOneAndUpdate(
+    { _id: imgId },
+    { $set: { images: imageUrl } },
+    { new: true },
+    (err, doc) => {
+      if (err) {
+        console.log("Something wrong when updating data!");
+      }
+
+      console.log(doc);
+    }
+  );
+}
+
+async function getExpirationDate(imgURL, imgId) {
+  var config = {
+    method: "get",
+    url: `${imgURL}`,
+    headers: {},
+  };
+
+  let objectKey = await axios(config)
+    .then((response) => {
+      console.log(response.status);
+    })
+    .catch((error) => {
+      // Handle error
+      console.log(error.response.status);
+      var urlObject = new URL(imgURL);
+      var objectKey = urlObject.pathname.split("/").pop();
+      console.log(objectKey); // Output: "OBJECT_KEY"
+      return objectKey;
+    });
+
+  console.log(objectKey);
+  if (objectKey) {
+    let imageUrl = await getObjectSignedUrl(objectKey);
+    console.log(imageUrl);
+    updateDatabase(imageUrl, imgId);
+  }
+}
 
 app.listen(8000, function () {
   console.log("listening on port 8000");

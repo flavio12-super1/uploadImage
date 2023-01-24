@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../styles/Home.css";
 
 function Home() {
   const [file, setFile] = useState();
@@ -39,7 +40,7 @@ function Home() {
   // render images from array
   const renderImages = () => {
     return images.map((imgURL, index) => (
-      <div key={index}>
+      <div key={index} className="imageDiv">
         <img src={imgURL.imgURL} className="myImage" alt="" />
       </div>
     ));

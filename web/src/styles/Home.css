@@ -1,0 +1,11 @@
+#imageWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.imageDiv {
+  width: 50%;
+}
+.myImage {
+  width: 100%;
+}
